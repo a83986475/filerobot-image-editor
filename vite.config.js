@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { uglify } from 'rollup-plugin-uglify';
 
 const pkg = require('./package.json');
 const pkgVersion = require('./lerna.json').version;
@@ -46,7 +45,6 @@ export default defineConfig(({ mode }) => {
             }
           : {},
       ),
-      isProduction && uglify(),
     ],
     server: {
       port: 1111,

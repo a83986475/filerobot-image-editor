@@ -28,7 +28,7 @@
     "lib"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.17.2",
+    "@babel/runtime": "^7.26.10",
     "@scaleflex/icons": "2.10.27",
     "@scaleflex/ui": "2.10.27",
     "konva": "9.3.6",
