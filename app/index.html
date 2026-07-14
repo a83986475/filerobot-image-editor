@@ -5,50 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>图片编辑器</title>
   <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --card: rgba(15, 23, 42, 0.72);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent1: #60a5fa;
+      --accent2: #a78bfa;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       min-height: 100vh;
-      background: #1a1a2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,0.18), transparent 30%),
+        radial-gradient(circle at right center, rgba(167,139,250,0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      padding: 24px;
     }
-    .upload-area {
+    .shell {
+      width: min(960px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .hero, .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    }
+    .hero {
+      padding: 34px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      min-height: 520px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: auto -60px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(96,165,250,0.26), transparent 70%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex;
       align-items: center;
-      gap: 20px;
-      padding: 24px;
-      text-align: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #dbeafe;
+      font-size: 13px;
+      background: rgba(255,255,255,0.04);
     }
     .title {
-      color: #e0e0e0;
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: 2px;
+      margin-top: 18px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
-    .subtitle {
-      color: #888;
+    .title span {
+      display: block;
+      background: linear-gradient(90deg, #fff, #c7d2fe 55%, #93c5fd);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .desc {
+      margin-top: 18px;
+      max-width: 52ch;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+    }
+    .feature {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #d1d5db;
       font-size: 14px;
-      line-height: 1.6;
+    }
+    .feature b { color: #fff; }
+    .panel {
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      justify-content: center;
+      min-height: 520px;
+    }
+    .panel h2 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .panel p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
     }
     .upload-btn {
+      margin-top: 8px;
       position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       cursor: pointer;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       color: white;
       border: none;
-      padding: 16px 48px;
+      padding: 16px 22px;
       font-size: 16px;
-      border-radius: 50px;
-      box-shadow: 0 4px 20px rgba(102,126,234,0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(96,165,250,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-weight: 600;
     }
     .upload-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(102,126,234,0.6);
+      box-shadow: 0 18px 38px rgba(167,139,250,0.26);
     }
     .upload-btn input[type=file] {
       position: absolute;
@@ -58,23 +159,63 @@
       width: 100%;
       height: 100%;
     }
+    .tip {
+      font-size: 13px;
+      color: #94a3b8;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 14px 16px;
+      line-height: 1.7;
+    }
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #dbeafe;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
     #editor_container {
       position: fixed;
       inset: 0;
       z-index: 999;
       display: none;
     }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      .hero, .panel { min-height: auto; }
+    }
   </style>
 </head>
 <body>
-  <div class="upload-area" id="upload-area">
-    <div class="title">🖼️ 图片编辑器</div>
-    <div class="subtitle">支持裁剪、滤镜、标注、水印等功能。<br>也支持直接通过 URL 参数打开：<code>?image=...</code> 和 <code>?name=...</code></div>
-    <label class="upload-btn">
-      点击上传图片开始编辑
-      <input type="file" accept="image/*" id="file-input" />
-    </label>
-  </div>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="badge"> 在线图片工坊 </div>
+        <h1 class="title"><span>上传图片</span>立即开始编辑</h1>
+        <p class="desc">
+          这是一个轻量、清爽的图片编辑入口。支持裁剪、旋转、滤镜、标注、水印和调整大小，也支持通过 URL 直接打开外链图片。
+        </p>
+      </div>
+      <div class="feature-list">
+        <div class="feature"><b>支持</b> 手动上传</div>
+        <div class="feature"><b>支持</b> 外链直开</div>
+        <div class="feature"><b>支持</b> 自动下载保存</div>
+        <div class="feature"><b>支持</b> 中文界面</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>开始使用</h2>
+      <p>点击下面按钮上传图片，或者直接访问带参数链接：</p>
+      <div class="tip"><code>?image=...</code> 自动加载图片，<code>&name=...</code> 设置保存文件名。</div>
+      <label class="upload-btn">
+        选择图片并开始编辑
+        <input type="file" accept="image/*" id="file-input" />
+      </label>
+      <p>外链图片需要目标站点允许浏览器跨域读取；如果不允许，页面会提示加载失败。</p>
+    </section>
+  </main>
 
   <div id="editor_container"></div>
 
@@ -107,9 +248,8 @@
     };
 
     let editorInstance = null;
-
     function launchEditor(src, filename) {
-      document.getElementById('upload-area').style.display = 'none';
+      document.querySelector('.shell').style.display = 'none';
       const container = document.getElementById('editor_container');
       container.style.display = 'block';
       if (editorInstance) editorInstance.terminate();
@@ -130,7 +270,7 @@
           editorInstance.terminate();
           editorInstance = null;
           container.style.display = 'none';
-          document.getElementById('upload-area').style.display = 'flex';
+          document.querySelector('.shell').style.display = 'grid';
           document.getElementById('file-input').value = '';
         }
       });
@@ -150,7 +290,7 @@
       const imageUrl = rawImage ? decodeURIComponent(rawImage) : null;
       const downloadName = rawName ? decodeURIComponent(rawName) : 'image.png';
       if (!imageUrl) return;
-      document.getElementById('upload-area').style.display = 'none';
+      document.querySelector('.shell').style.display = 'none';
       document.getElementById('editor_container').style.display = 'block';
       fetch(imageUrl)
         .then(res => {
@@ -161,7 +301,7 @@
         .catch(err => {
           console.error(err);
           alert('外部图片加载失败，请检查链接是否允许跨域访问。');
-          document.getElementById('upload-area').style.display = 'flex';
+          document.querySelector('.shell').style.display = 'grid';
           document.getElementById('editor_container').style.display = 'none';
         });
     })();
